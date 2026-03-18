@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout FE') {
+            steps {
+                git branch: 'main', url: 'https://github.com/maituananh/pawn-service-fe'
+            }
+        }
+
+        stage('Build FE') {
+            steps {
+                sh 'npm install && npm run build'
+            }
+        }
+    }
+}
