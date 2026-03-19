@@ -1,17 +1,112 @@
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Checkout FE') {
-            steps {
-                git branch: 'main', url: 'https://github.com/maituananh/pawn-service-fe'
-            }
-        }
+  environment {
+    REPO_URL = 'https://github.com/maituananh/pawn-service-fe'
+    BRANCH = 'main'
+    APP_NAME = 'frontend-pawn-app'
+  }
 
-        stage('Build FE') {
-            steps {
-                sh 'npm install && npm run build'
-            }
-        }
+  triggers {
+    githubPush()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        deleteDir()
+
+        git branch: "${BRANCH}", url: "${REPO_URL}"
+      }
     }
-}
+
+    stage('Install Dependencies') {
+      steps {
+        sh 'npm install'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        script {
+          // Generate timestamp
+          def timestamp = sh(
+            script: "date +%Y%m%d%H%M%S",
+                returnStdout: true
+            ).trim()
+
+            env.IMAGE_TAG = timestamp
+
+            sh """
+            docker build -t ${DOCKERHUB_REPO}:${IMAGE_TAG} .
+            """
+        }
+      }
+    }
+
+    stage('Push Docker Image') {
+      steps {
+        script {
+          sh """
+            echo "${params.DOCKER_PASS}" | docker login -u "${params.DOCKER_USER}" --password-stdin
+            docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
+            """
+
+          // Cleanup local images (keep 3 latest)
+          sh """
+            docker images ${DOCKERHUB_REPO} --format "{{.Tag}}" | \
+            sort -r | tail -n +4 | xargs -r -I {} docker rmi ${DOCKERHUB_REPO}:{} || true
+            """
+        }
+      }
+    }
+
+    stage('Pull Docker Image') {
+      steps {
+        script {
+          sh """
+          docker pull ${DOCKERHUB_REPO}:${IMAGE_TAG}
+          """
+        }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        script {
+          sh """
+          echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+
+          docker stop ${APP_NAME} || true
+          docker rm ${APP_NAME} || true
+          docker run -d \
+            --name ${APP_NAME} \
+            -p 3000:80 \
+            ${DOCKERHUB_REPO}:${IMAGE_TAG}
+          """
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      echo '✅ Build & Deploy success'
+    }
+    failure {
+      echo '❌ Pipeline failed'
+    }
+  }
+}
