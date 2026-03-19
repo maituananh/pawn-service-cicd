@@ -1,0 +1,17 @@
+tunnel: xxxxxxx
+credentials-file: C:\Users\AnhMaiTuan\.cloudflared\xxxxxxx.json
+
+ingress:
+  - hostname: api.baotrang.io.vn
+    service: http://localhost:80
+
+  - hostname: minio-ui.baotrang.io.vn
+    service: http://localhost:80
+
+  - hostname: minio.baotrang.io.vn
+    service: http://localhost:80
+
+  - hostname: jenkins.baotrang.io.vn
+    service: http://localhost:80
+
+  - service: http_status:404
