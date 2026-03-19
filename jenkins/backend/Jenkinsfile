@@ -6,6 +6,10 @@ pipeline {
     BRANCH = 'anhkiet-branch' 
     APP_NAME = 'backend-pawn-app'
   }
+
+  triggers {
+    githubPush() 
+  }
   
   stages {
     stage('Checkout') {
