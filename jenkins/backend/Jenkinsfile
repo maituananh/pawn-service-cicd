@@ -11,7 +11,7 @@ pipeline {
     stage('Checkout') {
       steps {
         deleteDir()
-        
+
         git branch: "${BRANCH}", url: "${REPO_URL}"
       }
     }
@@ -56,21 +56,16 @@ pipeline {
     stage('Push Docker Image') {
       steps {
         script {  
-          withCredentials([usernamePassword(
-            credentialsId: 'dockerhub-credentials',
-            usernameVariable: 'DOCKER_USER',
-            passwordVariable: 'DOCKER_PASS'
-          )]) {
-            sh """
-            echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+          sh """
+            echo "${params.DOCKER_PASS}" | docker login -u "${params.DOCKER_USER}" --password-stdin
             docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
             """
 
-            // Cleanup local images (keep 3 latest)
-            sh """
-            docker images ${DOCKERHUB_REPO} --format "{{.Tag}}" | sort -r | tail -n +4 | xargs -r -I {} docker rmi ${DOCKERHUB_REPO}:{}
+          // Cleanup local images (keep 3 latest)
+          sh """
+            docker images ${DOCKERHUB_REPO} --format "{{.Tag}}" | \
+            sort -r | tail -n +4 | xargs -r -I {} docker rmi ${DOCKERHUB_REPO}:{} || true
             """
-          }
         }
       }
     }
