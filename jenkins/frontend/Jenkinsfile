@@ -2,9 +2,15 @@ pipeline {
   agent any
 
   environment {
-    REPO_URL = 'https://github.com/maituananh/pawn-service-fe'
-    BRANCH = 'main'
-    APP_NAME = 'frontend-pawn-app'
+    REPO_URL           = 'https://github.com/maituananh/pawn-service-fe'
+    BRANCH             = 'main'
+    APP_NAME           = 'frontend-pawn-app'
+    TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
+    TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
+    DOCKER_USER        = credentials('DOCKER_USER')
+    DOCKER_PASS        = credentials('DOCKER_PASS')
+    DOCKERHUB_REPO     = credentials('DOCKERHUB_REPO_FE')
+    FE_PORT            = credentials('FE_PORT')
   }
 
   triggers {
@@ -12,7 +18,7 @@ pipeline {
   }
 
   tools {
-    nodejs 'nodejs22.14.0' 
+    nodejs 'nodejs22.14.0'
   }
 
   stages {
@@ -54,7 +60,7 @@ pipeline {
             env.IMAGE_TAG = timestamp
 
             sh """
-            docker build -t ${DOCKERHUB_REPO}:${IMAGE_TAG} .
+            docker build -t \${DOCKERHUB_REPO}:\${IMAGE_TAG} .
             """
         }
       }
@@ -64,14 +70,14 @@ pipeline {
       steps {
         script {
           sh """
-            echo "${params.DOCKER_PASS}" | docker login -u "${params.DOCKER_USER}" --password-stdin
-            docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
+            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+            docker push \${DOCKERHUB_REPO}:\${IMAGE_TAG}
             """
 
           // Cleanup local images (keep 3 latest)
           sh """
-            docker images ${DOCKERHUB_REPO} --format "{{.Tag}}" | \
-            sort -r | tail -n +4 | xargs -r -I {} docker rmi ${DOCKERHUB_REPO}:{} || true
+            docker images \${DOCKERHUB_REPO} --format "{{.Tag}}" | \\
+            sort -r | tail -n +4 | xargs -r -I {} docker rmi \${DOCKERHUB_REPO}:{} || true
             """
         }
       }
@@ -81,7 +87,7 @@ pipeline {
       steps {
         script {
           sh """
-          docker pull ${DOCKERHUB_REPO}:${IMAGE_TAG}
+          docker pull \${DOCKERHUB_REPO}:\${IMAGE_TAG}
           """
         }
       }
@@ -91,14 +97,14 @@ pipeline {
       steps {
         script {
           sh """
-          echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+          echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
 
           docker stop ${APP_NAME} || true
           docker rm ${APP_NAME} || true
-          docker run -d \
-            --name ${APP_NAME} \
-            -p 3000:80 \
-            ${DOCKERHUB_REPO}:${IMAGE_TAG}
+          docker run -d \\
+            --name ${APP_NAME} \\
+            -p \${FE_PORT}:80 \\
+            \${DOCKERHUB_REPO}:\${IMAGE_TAG}
           """
         }
       }
@@ -107,10 +113,42 @@ pipeline {
 
   post {
     success {
-      echo '✅ Build & Deploy success'
+      script {
+        def msg = """
+          ✅ *Pipeline PASSED* 🎉
+          *Job:* `${env.JOB_NAME}`
+          *Build:* [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+          *Branch:* `${BRANCH}`
+          *Duration:* ${currentBuild.durationString}
+        """.stripIndent().trim()
+
+        sh """
+          curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \\
+            -d chat_id=\${TELEGRAM_CHAT_ID} \\
+            -d parse_mode=Markdown \\
+            -d text="${msg}"
+        """
+      }
     }
+
     failure {
-      echo '❌ Pipeline failed'
+      script {
+        def msg = """
+          ❌ *Pipeline FAILED*
+          *Job:* `${env.JOB_NAME}`
+          *Build:* [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+          *Branch:* `${BRANCH}`
+          *Duration:* ${currentBuild.durationString}
+          *Stage Failed:* `${env.STAGE_NAME ?: 'Unknown'}`
+        """.stripIndent().trim()
+
+        sh """
+          curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \\
+            -d chat_id=\${TELEGRAM_CHAT_ID} \\
+            -d parse_mode=Markdown \\
+            -d text="${msg}"
+        """
+      }
     }
   }
 }
