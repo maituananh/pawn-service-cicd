@@ -11,6 +11,10 @@ pipeline {
     githubPush()
   }
 
+  tools {
+    nodejs 'node22' 
+  }
+
   stages {
     stage('Checkout') {
       steps {
@@ -109,4 +113,4 @@ pipeline {
       echo '❌ Pipeline failed'
     }
   }
-}
+}
