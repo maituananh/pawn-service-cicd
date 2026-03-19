@@ -10,6 +10,8 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
+        deleteDir()
+        
         git branch: "${BRANCH}", url: "${REPO_URL}"
       }
     }
