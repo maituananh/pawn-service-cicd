@@ -8,5 +8,5 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./deploy/nginx/proxy-params.conf:/etc/nginx/snippets/proxy-params.conf
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./config/proxy-params.conf:/etc/nginx/snippets/proxy-params.conf
