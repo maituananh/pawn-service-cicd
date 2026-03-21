@@ -7,7 +7,7 @@ pipeline {
     REPO_URL           = 'https://github.com/maituananh/pawn-service-fe'
     BRANCH             = 'main'
     APP_NAME           = 'frontend-pawn-app'
-    NODE_ENV           = 'production'
+
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
     DOCKER_USER        = credentials('DOCKER_USER')
@@ -50,6 +50,10 @@ pipeline {
     }
 
     stage('Build') {
+      environment {
+        NODE_ENV = 'production'
+      }
+
       steps {
         sh 'npm run build'
       }
