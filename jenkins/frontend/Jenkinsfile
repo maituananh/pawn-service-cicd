@@ -7,13 +7,14 @@ pipeline {
     REPO_URL           = 'https://github.com/maituananh/pawn-service-fe'
     BRANCH             = 'main'
     APP_NAME           = 'frontend-pawn-app'
+    NODE_ENV           = 'production'
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
     DOCKER_USER        = credentials('DOCKER_USER')
     DOCKER_PASS        = credentials('DOCKER_PASS')
     DOCKERHUB_REPO     = credentials('DOCKERHUB_REPO_FE')
     FE_PORT            = credentials('FE_PORT')
-    API_BASE_URL       = credentials('API_BASE_URL')
+    VITE_API_BASE_URL  = credentials('API_BASE_URL')
   }
 
   triggers {
@@ -49,11 +50,6 @@ pipeline {
     }
 
     stage('Build') {
-      environment {
-        NODE_ENV = 'production'
-        VITE_API_BASE_URL = "\${API_BASE_URL}"
-      }
-
       steps {
         sh 'npm run build'
       }
@@ -64,7 +60,7 @@ pipeline {
         script {
           // Generate timestamp
           def timestamp = sh(
-            script: "date +%Y%m%d%H%M%S",
+            script: 'date +%Y%m%d%H%M%S',
                 returnStdout: true
             ).trim()
 
@@ -126,19 +122,17 @@ pipeline {
   }
 
   post {
-    success {
+    always {
       script {
-        telegram('SUCCESS', env.BRANCH)
-      }
-    }
-    failure {
-      script {
-        telegram('FAILURE', env.BRANCH)
-      }
-    }
-    aborted {
-      script {
-        telegram('ABORTED', env.BRANCH)
+        if (currentBuild.currentResult == 'FAILURE') {
+          telegram('FAILURE', env.BRANCH)
+        }
+        else if (currentBuild.currentResult == 'SUCCESS') {
+          telegram('SUCCESS', env.BRANCH)
+        }
+        else {
+          telegram('ABORTED', env.BRANCH)
+        }
       }
     }
   }
