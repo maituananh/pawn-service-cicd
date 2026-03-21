@@ -77,9 +77,8 @@ pipeline {
 
     stage('Push Docker Image') {
       when {
-        anyOf {
-          branch 'anhkiet-branch'
-          expression { env.GIT_BRANCH == 'origin/anhkiet-branch' }
+        expression {
+          return env.GIT_BRANCH == 'origin/anhkiet-branch'
         }
       }
 
@@ -101,9 +100,8 @@ pipeline {
 
     stage('Pull Docker Image') {
       when {
-        anyOf {
-          branch 'anhkiet-branch'
-          expression { env.GIT_BRANCH == 'origin/anhkiet-branch' }
+        expression {
+          return env.GIT_BRANCH == 'origin/anhkiet-branch'
         }
       }
 
@@ -118,9 +116,8 @@ pipeline {
 
     stage('Deploy') {
       when {
-        anyOf {
-          branch 'anhkiet-branch'
-          expression { env.GIT_BRANCH == 'origin/anhkiet-branch' }
+        expression {
+          return env.GIT_BRANCH == 'origin/anhkiet-branch'
         }
       }
 
