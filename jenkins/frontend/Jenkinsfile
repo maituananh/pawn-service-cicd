@@ -43,6 +43,13 @@ pipeline {
       }
     }
 
+    stage('Setup env') {
+      environment {
+        NODE_ENV = 'production'
+        VITE_API_BASE_URL = "${API_BASE_URL}"
+      }
+    }
+
     stage('Build') {
       steps {
         sh 'npm run build'
@@ -61,7 +68,9 @@ pipeline {
             env.IMAGE_TAG = timestamp
 
             sh """
-            docker build -t \${DOCKERHUB_REPO}:\${IMAGE_TAG} .
+            docker build \\
+              --build-arg VITE_API_BASE_URL=\${API_BASE_URL} \\
+              -t \${DOCKERHUB_REPO}:\${IMAGE_TAG} .
             """
         }
       }
