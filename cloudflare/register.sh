@@ -9,6 +9,6 @@ cloudflared tunnel route dns pawn-service minio-ui.baotrang.io.vn
 
 cloudflared tunnel route dns pawn-service jenkins.baotrang.io.vn
 
-cloudflared tunnel route dns pawn-service ui.baotrang.io.vn
+cloudflared tunnel route dns pawn-service baotrang.io.vn
 
 cloudflared tunnel run pawn-service

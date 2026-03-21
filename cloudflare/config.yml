@@ -2,6 +2,9 @@ tunnel: xxxxxxx
 credentials-file: C:\Users\AnhMaiTuan\.cloudflared\xxxxxxx.json
 
 ingress:
+  - hostname: baotrang.io.vn
+    service: http://localhost:80
+
   - hostname: api.baotrang.io.vn
     service: http://localhost:80
 
@@ -12,9 +15,6 @@ ingress:
     service: http://localhost:80
 
   - hostname: jenkins.baotrang.io.vn
-    service: http://localhost:80
-    
-  - hostname: ui.baotrang.io.vn
     service: http://localhost:80
 
   - service: http_status:404
