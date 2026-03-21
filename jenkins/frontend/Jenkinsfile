@@ -88,9 +88,8 @@ pipeline {
 
     stage('Push Docker Image') {
       when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' }
+        expression {
+          return env.GIT_BRANCH == 'origin/main'
         }
       }
 
@@ -112,9 +111,8 @@ pipeline {
 
     stage('Pull Docker Image') {
       when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' }
+        expression {
+          return env.GIT_BRANCH == 'origin/main'
         }
       }
 
@@ -129,9 +127,8 @@ pipeline {
 
     stage('Deploy') {
       when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' }
+        expression {
+          return env.GIT_BRANCH == 'origin/main'
         }
       }
 
