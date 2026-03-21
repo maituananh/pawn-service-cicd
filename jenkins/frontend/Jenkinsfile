@@ -156,5 +156,27 @@ pipeline {
         """
       }
     }
+
+    aborted {
+      script {
+        def msg = """
+          ⚠️ *Pipeline ABORTED*
+          *Job:* `${env.JOB_NAME}`
+          *Build:* [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+          *Branch:* `${BRANCH}`
+          *Duration:* ${currentBuild.durationString}
+          *Stage Failed:* `${env.STAGE_NAME ?: 'Unknown'}`
+        """.stripIndent().trim()
+
+        msg = msg.replace('`', '\\`')
+
+        sh """
+          curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \\
+            -d chat_id=\${TELEGRAM_CHAT_ID} \\
+            -d parse_mode=Markdown \\
+            -d text="${msg}"
+        """
+      }
+    }
   }
 }
