@@ -81,8 +81,12 @@ pipeline {
 
     stage('Push Docker Image') {
       when {
-        branch 'main'
+        anyOf {
+          branch 'main'
+          expression { env.GIT_BRANCH == 'origin/main' }
+        }
       }
+
       steps {
         script {
           sh """
@@ -101,8 +105,12 @@ pipeline {
 
     stage('Pull Docker Image') {
       when {
-        branch 'main'
+        anyOf {
+          branch 'main'
+          expression { env.GIT_BRANCH == 'origin/main' }
+        }
       }
+
       steps {
         script {
           sh """
@@ -114,8 +122,12 @@ pipeline {
 
     stage('Deploy') {
       when {
-        branch 'main'
+        anyOf {
+          branch 'main'
+          expression { env.GIT_BRANCH == 'origin/main' }
+        }
       }
+
       steps {
         script {
           sh """
