@@ -15,7 +15,8 @@ pipeline {
     STRIPE_API_KEY     = credentials('STRIPE_API_KEY')
     STRIPE_WEBHOOK_SECRET = credentials('STRIPE_WEBHOOK_SECRET')
     AI_OPENAI_API_KEY  = credentials('AI_OPENAI_API_KEY')
-    DB_HOST = credentials('DB_HOST')
+    DB_HOST = credentials('DB_HOST') // docker ip
+    REDIS_HOST = credentials('REDIS_HOST') // docker ip
   }
 
   triggers {
@@ -112,6 +113,7 @@ pipeline {
             -e STRIPE_API_KEY=\${STRIPE_API_KEY} \\
             -e STRIPE_WEBHOOK_SECRET=\${STRIPE_WEBHOOK_SECRET} \\
             -e AI_OPENAI_API_KEY=\${AI_OPENAI_API_KEY} \\
+            -e REDIS_HOST=\${REDIS_HOST} \\
             \${DOCKERHUB_REPO}:${IMAGE_TAG}
           """
         }
