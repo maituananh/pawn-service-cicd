@@ -143,8 +143,11 @@ pipeline {
         else if (currentBuild.currentResult == 'SUCCESS') {
           telegram('SUCCESS', env.BRANCH)
         }
-        else {
+        else if (currentBuild.currentResult == 'ABORTED') {
           telegram('ABORTED', env.BRANCH)
+        }
+        else {
+          telegram('UNSTABLE', env.BRANCH)
         }
       }
     }
