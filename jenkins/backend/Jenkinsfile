@@ -129,6 +129,8 @@ pipeline {
           *Duration:* ${currentBuild.durationString}
         """.stripIndent().trim()
 
+        msg = msg.replace('`', '\\`')
+
         sh """
           curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \\
             -d chat_id=\${TELEGRAM_CHAT_ID} \\
@@ -148,6 +150,8 @@ pipeline {
           *Duration:* ${currentBuild.durationString}
           *Stage Failed:* `${env.STAGE_NAME ?: 'Unknown'}`
         """.stripIndent().trim()
+
+        msg = msg.replace('`', '\\`')
 
         sh """
           curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \\
