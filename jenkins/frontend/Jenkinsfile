@@ -7,6 +7,7 @@ pipeline {
     REPO_URL           = 'https://github.com/maituananh/pawn-service-fe'
     BRANCH             = 'main'
     APP_NAME           = 'frontend-pawn-app'
+    CICD_REPO_NAME     = 'maituananh/pawn-service-cicd'
 
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
@@ -30,7 +31,7 @@ pipeline {
       ],
       causeString: 'Triggered by GitHub webhook',
       tokenCredentialId: 'SECRET_TOKEN_FE',
-      token: '\${SECRET_TOKEN_FE}',
+      token: "${SECRET_TOKEN_FE}",
       printContributedVariables: true,
       printPostContent: true
     )
@@ -48,7 +49,11 @@ pipeline {
         }
         deleteDir()
 
-        git branch: "${BRANCH}", url: "${REPO_URL}"
+        if (env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
+          git branch: "${BRANCH}", url: "${REPO_URL}"
+        } else {
+          git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
+        }
       }
     }
 
@@ -80,7 +85,7 @@ pipeline {
         echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
         echo "env.GITHUB_PR_BASE_REF: ${env.GITHUB_PR_BASE_REF}"
         echo "env.GITHUB_REPO_NAME: ${env.GITHUB_REPO_NAME}"
-        echo "env.BRANCH: ${env.GIT_BRANCH}"
+        echo "env.GITHUB_PR_HEAD_REF: ${env.GITHUB_PR_HEAD_REF}"
       }
     }
 
@@ -171,17 +176,19 @@ pipeline {
   post {
     always {
       script {
-        if (currentBuild.currentResult == 'FAILURE') {
-          telegram('FAILURE', ${env.GITHUB_PR_HEAD_REF})
-        }
-        else if (currentBuild.currentResult == 'SUCCESS') {
-          telegram('SUCCESS', ${env.GITHUB_PR_HEAD_REF})
-        }
-        else if (currentBuild.currentResult == 'ABORTED') {
-          telegram('ABORTED', ${env.GITHUB_PR_HEAD_REF})
-        }
-        else {
-          telegram('UNSTABLE', ${env.GITHUB_PR_HEAD_REF})
+        try {
+          if (currentBuild.currentResult == 'FAILURE') {
+            telegram('FAILURE', "${env.GITHUB_PR_HEAD_REF}")
+          }
+          else if (currentBuild.currentResult == 'SUCCESS') {
+            telegram('SUCCESS', "${env.GITHUB_PR_HEAD_REF}")
+          }
+          else if (currentBuild.currentResult == 'ABORTED') {
+            telegram('ABORTED', "${env.GITHUB_PR_HEAD_REF}")
+          }
+        } catch(Exception e) {
+          echo "Error: ${e}"
+          telegram('UNSTABLE', "${env.GITHUB_PR_HEAD_REF}")
         }
       }
     }

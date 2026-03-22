@@ -7,6 +7,7 @@ pipeline {
     REPO_URL           = 'https://github.com/maituananh/backend'
     BRANCH             = 'anhkiet-branch'
     APP_NAME           = 'backend-pawn-app'
+    CICD_REPO_NAME     = 'maituananh/pawn-service-cicd'
 
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
@@ -34,7 +35,7 @@ pipeline {
       ],
       causeString: 'Triggered by GitHub webhook',
       tokenCredentialId: 'SECRET_TOKEN_BE',
-      token: '\${SECRET_TOKEN_BE}',
+      token: "${SECRET_TOKEN_BE}",
       printContributedVariables: true,
       printPostContent: true
     )
@@ -48,7 +49,11 @@ pipeline {
         }
         deleteDir()
 
-        git branch: "${BRANCH}", url: "${REPO_URL}"
+        if (env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
+          git branch: "${BRANCH}", url: "${REPO_URL}"
+        } else {
+          git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
+        }
       }
     }
 
@@ -74,7 +79,6 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          // Generate timestamp
           def timestamp = sh(
             script: 'date +%Y%m%d%H%M%S',
                 returnStdout: true
@@ -86,13 +90,6 @@ pipeline {
             docker build -t \${DOCKERHUB_REPO}:${IMAGE_TAG} .
             """
         }
-      }
-    }
-
-    stage('Debug') {
-      steps {
-        echo "BRANCH_NAME = ${env.BRANCH_NAME}"
-        echo "GIT_BRANCH = ${env.GIT_BRANCH}"
       }
     }
 
@@ -170,16 +167,16 @@ pipeline {
     always {
       script {
         if (currentBuild.currentResult == 'FAILURE') {
-          telegram('FAILURE', ${env.GITHUB_PR_HEAD_REF})
+          telegram('FAILURE', "${env.GITHUB_PR_HEAD_REF}")
         }
         else if (currentBuild.currentResult == 'SUCCESS') {
-          telegram('SUCCESS', ${env.GITHUB_PR_HEAD_REF})
+          telegram('SUCCESS', "${env.GITHUB_PR_HEAD_REF}")
         }
         else if (currentBuild.currentResult == 'ABORTED') {
-          telegram('ABORTED', ${env.GITHUB_PR_HEAD_REF})
+          telegram('ABORTED', "${env.GITHUB_PR_HEAD_REF}")
         }
         else {
-          telegram('UNSTABLE', ${env.GITHUB_PR_HEAD_REF})
+          telegram('UNSTABLE', "${env.GITHUB_PR_HEAD_REF}")
         }
       }
     }
