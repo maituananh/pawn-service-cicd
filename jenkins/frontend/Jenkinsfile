@@ -89,10 +89,10 @@ pipeline {
     }
 
     stage('Debug Payload') {
-      echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
-      echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
-      
       steps {
+        echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
+        echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
+
         when {
           expression { 
             return env.GITHUB_PR_ACTION == 'closed' && env.GITHUB_PR_MERGED == 'true' 
