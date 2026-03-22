@@ -21,7 +21,10 @@ pipeline {
     // githubPush()
     GenericTrigger(
       genericVariables: [
-        [key: 'WEBHOOK_PAYLOAD', value: '$', defaultValue: '{}'],
+        [key: 'GITHUB_PR_ACTION',   value: '$.action',                defaultValue: ''],
+        [key: 'GITHUB_PR_MERGED',   value: '$.pull_request.merged',   defaultValue: 'false'],
+        [key: 'GITHUB_PR_BASE_REF', value: '$.pull_request.base.ref', defaultValue: ''],
+        [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
       ],
       causeString: 'Triggered by GitHub webhook',
       token: 'YOUR_SECRET_TOKEN',
@@ -68,6 +71,16 @@ pipeline {
       }
     }
 
+    stage('Debug Payload') {
+      steps {
+        echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
+        echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
+        echo "env.GITHUB_PR_BASE_REF: ${env.GITHUB_PR_BASE_REF}"
+        echo "env.GITHUB_REPO_NAME: ${env.GITHUB_REPO_NAME}"
+        echo "env.BRANCH: ${env.BRANCH}"
+      }
+    }
+
     stage('Build Docker Image') {
       steps {
         script {
@@ -85,26 +98,6 @@ pipeline {
               -t \${DOCKERHUB_REPO}:\${IMAGE_TAG} .
             """
         }
-      }
-    }
-
-    stage('Debug Payload') {
-      steps {
-        echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
-        echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
-
-        when {
-          expression { 
-            return env.GITHUB_PR_ACTION == 'closed' && env.GITHUB_PR_MERGED == 'true' 
-          }
-        }
-        
-        echo "PR merged: ${env.PR_MERGED}"
-        echo "Repo: ${env.REPO_NAME}"
-        echo "Action: ${env.PR_ACTION}"
-        echo "Base ref: ${env.PR_BASE_REF}"
-        echo "Head ref: ${env.PR_HEAD_REF}"
-        echo "Commit SHA: ${env.COMMIT_SHA}"
       }
     }
 
