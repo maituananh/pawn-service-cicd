@@ -20,10 +20,24 @@ pipeline {
     AI_OPENAI_API_KEY  = credentials('AI_OPENAI_API_KEY')
     DB_HOST = credentials('DB_HOST') // docker ip
     REDIS_HOST = credentials('REDIS_HOST') // docker ip
+    SECRET_TOKEN_BE = credentials('SECRET_TOKEN_BE')
   }
 
   triggers {
-    githubPush()
+    // githubPush()
+    GenericTrigger(
+      genericVariables: [
+        [key: 'GITHUB_PR_ACTION',   value: '$.action',                defaultValue: ''],
+        [key: 'GITHUB_PR_MERGED',   value: '$.pull_request.merged',   defaultValue: 'false'],
+        [key: 'GITHUB_PR_BASE_REF', value: '$.pull_request.base.ref', defaultValue: ''],
+        [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
+      ],
+      causeString: 'Triggered by GitHub webhook',
+      tokenCredentialId: 'SECRET_TOKEN_BE',
+      token: '\${SECRET_TOKEN_BE}',
+      printContributedVariables: true,
+      printPostContent: true
+    )
   }
 
   stages {
@@ -85,7 +99,7 @@ pipeline {
     stage('Push Docker Image') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/anhkiet-branch'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
@@ -108,7 +122,7 @@ pipeline {
     stage('Pull Docker Image') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/anhkiet-branch'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
@@ -124,7 +138,7 @@ pipeline {
     stage('Deploy') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/anhkiet-branch'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
@@ -156,16 +170,16 @@ pipeline {
     always {
       script {
         if (currentBuild.currentResult == 'FAILURE') {
-          telegram('FAILURE', env.BRANCH)
+          telegram('FAILURE', ${env.GITHUB_PR_HEAD_REF})
         }
         else if (currentBuild.currentResult == 'SUCCESS') {
-          telegram('SUCCESS', env.BRANCH)
+          telegram('SUCCESS', ${env.GITHUB_PR_HEAD_REF})
         }
         else if (currentBuild.currentResult == 'ABORTED') {
-          telegram('ABORTED', env.BRANCH)
+          telegram('ABORTED', ${env.GITHUB_PR_HEAD_REF})
         }
         else {
-          telegram('UNSTABLE', env.BRANCH)
+          telegram('UNSTABLE', ${env.GITHUB_PR_HEAD_REF})
         }
       }
     }

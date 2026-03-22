@@ -15,7 +15,7 @@ pipeline {
     DOCKERHUB_REPO     = credentials('DOCKERHUB_REPO_FE')
     FE_PORT            = credentials('FE_PORT')
     VITE_API_BASE_URL  = credentials('API_BASE_URL')
-    SECRET_TOKEN_FE       = credentials('SECRET_TOKEN_FE')
+    SECRET_TOKEN_FE    = credentials('SECRET_TOKEN_FE')
   }
 
   triggers {
@@ -26,9 +26,11 @@ pipeline {
         [key: 'GITHUB_PR_MERGED',   value: '$.pull_request.merged',   defaultValue: 'false'],
         [key: 'GITHUB_PR_BASE_REF', value: '$.pull_request.base.ref', defaultValue: ''],
         [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
+        [key: 'GITHUB_PR_HEAD_REF', value: '$.pull_request.head.ref', defaultValue: ''],
       ],
       causeString: 'Triggered by GitHub webhook',
-      tokenCredentialId: '\${SECRET_TOKEN_FE}',
+      tokenCredentialId: 'SECRET_TOKEN_FE',
+      token: '\${SECRET_TOKEN_FE}',
       printContributedVariables: true,
       printPostContent: true
     )
@@ -170,16 +172,16 @@ pipeline {
     always {
       script {
         if (currentBuild.currentResult == 'FAILURE') {
-          telegram('FAILURE', env.BRANCH)
+          telegram('FAILURE', ${env.GITHUB_PR_HEAD_REF})
         }
         else if (currentBuild.currentResult == 'SUCCESS') {
-          telegram('SUCCESS', env.BRANCH)
+          telegram('SUCCESS', ${env.GITHUB_PR_HEAD_REF})
         }
         else if (currentBuild.currentResult == 'ABORTED') {
-          telegram('ABORTED', env.BRANCH)
+          telegram('ABORTED', ${env.GITHUB_PR_HEAD_REF})
         }
         else {
-          telegram('UNSTABLE', env.BRANCH)
+          telegram('UNSTABLE', ${env.GITHUB_PR_HEAD_REF})
         }
       }
     }
