@@ -19,6 +19,19 @@ pipeline {
 
   triggers {
     githubPush()
+    GenericTrigger(
+      genericVariables: [
+        [key: 'GIT_BRANCH_REF', value: '$.ref'],
+        [key: 'PR_ACTION',      value: '$.action'],
+        [key: 'PR_MERGED',      value: '$.pull_request.merged'],
+        [key: 'REPO_NAME',      value: '$.repository.full_name'],
+        [key: 'COMMIT_SHA',     value: '$.after'],
+      ],
+      causeString: 'Triggered by GitHub webhook',
+      token: 'YOUR_SECRET_TOKEN',
+      printContributedVariables: true,
+      printPostContent: true
+    )
   }
 
   tools {
@@ -77,22 +90,6 @@ pipeline {
             """
         }
       }
-    }
-
-    triggers {
-      GenericTrigger(
-        genericVariables: [
-          [key: 'GIT_BRANCH_REF', value: '$.ref'],
-          [key: 'PR_ACTION',      value: '$.action'],
-          [key: 'PR_MERGED',      value: '$.pull_request.merged'],
-          [key: 'REPO_NAME',      value: '$.repository.full_name'],
-          [key: 'COMMIT_SHA',     value: '$.after'],
-        ],
-        causeString: 'Triggered by GitHub webhook',
-        token: 'YOUR_SECRET_TOKEN',
-        printContributedVariables: true,
-        printPostContent: true
-      )
     }
 
     stages {
