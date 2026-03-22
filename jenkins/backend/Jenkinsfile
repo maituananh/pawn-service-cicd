@@ -8,6 +8,7 @@ pipeline {
     BRANCH             = 'anhkiet-branch'
     APP_NAME           = 'backend-pawn-app'
     CICD_REPO_NAME     = 'maituananh/pawn-service-cicd'
+    REPO_URL_CICD      = 'https://github.com/maituananh/pawn-service-cicd'
 
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
@@ -22,6 +23,8 @@ pipeline {
     DB_HOST = credentials('DB_HOST') // docker ip
     REDIS_HOST = credentials('REDIS_HOST') // docker ip
     SECRET_TOKEN_BE = credentials('SECRET_TOKEN_BE')
+    JENKINS_KEY = credentials('JENKINS_KEY')
+    JENKINS_USER_KEY   = credentials('JENKINS_USER_KEY')
   }
 
   triggers {
@@ -42,6 +45,27 @@ pipeline {
   }
 
   stages {
+    stage('Validate Jenkinsfile') {
+      when {
+        expression {
+          return env.GITHUB_PR_ACTION == 'opened' || env.GITHUB_PR_ACTION == 'synchronize'
+        }
+      }
+
+      steps {
+        script {
+          git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL_CICD}"
+
+          sh """
+            curl -s -X POST \
+              https://jenkins.baotrang.io.vn/pipeline-model-converter/validate \
+              --user \${JENKINS_USER_KEY}:\${SECRET_TOKEN_BE} \
+              -F "jenkinsfile=<jenkins/backend/Jenkinsfile"
+          """
+        }
+      }
+    }
+
     stage('Checkout') {
       steps {
         script {
