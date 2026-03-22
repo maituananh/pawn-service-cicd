@@ -21,13 +21,7 @@ pipeline {
     githubPush()
     GenericTrigger(
       genericVariables: [
-        [key: 'requestBody', value: '$', expressionType: 'JSONPath', regexpFilter: '', defaultValue: ''],
-        [key: 'PR_ACTION',   value: '$.action'],
-        [key: 'PR_MERGED',   value: '$.pull_request.merged'],
-        [key: 'PR_BASE_REF', value: '$.pull_request.base.ref'],
-        [key: 'PR_HEAD_REF', value: '$.pull_request.head.ref'],
-        [key: 'REPO_NAME',   value: '$.repository.full_name'],
-        [key: 'COMMIT_SHA',  value: '$.pull_request.merge_commit_sha'],
+        [key: 'WEBHOOK_PAYLOAD', value: '$', defaultValue: '{}'],
       ],
       causeString: 'Triggered by GitHub webhook',
       token: 'YOUR_SECRET_TOKEN',
@@ -96,6 +90,13 @@ pipeline {
 
     stage('Debug Payload') {
       steps {
+        script {
+          def payload = readJSON text: env.WEBHOOK_PAYLOAD
+          echo "Action: ${payload.action}"
+          echo "Merged: ${payload.pull_request.merged}"
+          echo "Base:   ${payload.pull_request.base.ref}"
+        }
+
         script {
           def payload = readJSON text: requestBody
           // Example: access a field
