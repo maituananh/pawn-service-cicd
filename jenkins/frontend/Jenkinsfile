@@ -31,7 +31,7 @@ pipeline {
       ],
       causeString: 'Triggered by GitHub webhook',
       tokenCredentialId: 'SECRET_TOKEN_FE',
-      token: "${SECRET_TOKEN_FE}",
+      token: "SECRET_TOKEN_FE",
       printContributedVariables: true,
       printPostContent: true
     )
