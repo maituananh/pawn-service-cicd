@@ -15,6 +15,7 @@ pipeline {
     DOCKERHUB_REPO     = credentials('DOCKERHUB_REPO_FE')
     FE_PORT            = credentials('FE_PORT')
     VITE_API_BASE_URL  = credentials('API_BASE_URL')
+    SECRET_TOKEN       = credentials('SECRET_TOKEN_FE')
   }
 
   triggers {
@@ -27,7 +28,7 @@ pipeline {
         [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
       ],
       causeString: 'Triggered by GitHub webhook',
-      token: 'YOUR_SECRET_TOKEN',
+      token: '\${SECRET_TOKEN}',
       printContributedVariables: true,
       printPostContent: true
     )
