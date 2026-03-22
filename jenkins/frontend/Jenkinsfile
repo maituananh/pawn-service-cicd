@@ -28,7 +28,7 @@ pipeline {
         [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
       ],
       causeString: 'Triggered by GitHub webhook',
-      token: '\${SECRET_TOKEN_FE}',
+      tokenCredentialId: '\${SECRET_TOKEN_FE}',
       printContributedVariables: true,
       printPostContent: true
     )
@@ -105,7 +105,7 @@ pipeline {
     stage('Push Docker Image') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/main'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
@@ -128,7 +128,7 @@ pipeline {
     stage('Pull Docker Image') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/main'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
@@ -144,7 +144,7 @@ pipeline {
     stage('Deploy') {
       when {
         expression {
-          return env.GIT_BRANCH == 'origin/main'
+          return env.GITHUB_PR_MERGED == 'true'
         }
       }
 
