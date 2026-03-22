@@ -92,13 +92,11 @@ pipeline {
       }
     }
 
-    stages {
-      stage('Debug Payload') {
-        steps {
-          echo "Ref: ${env.GIT_BRANCH_REF}"
-          echo "PR merged: ${env.PR_MERGED}"
-          echo "Repo: ${env.REPO_NAME}"
-        }
+    stage('Debug Payload') {
+      steps {
+        echo "Ref: ${env.GIT_BRANCH_REF}"
+        echo "PR merged: ${env.PR_MERGED}"
+        echo "Repo: ${env.REPO_NAME}"
       }
     }
 
