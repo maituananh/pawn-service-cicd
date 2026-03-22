@@ -27,7 +27,6 @@ pipeline {
         [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
       ],
       causeString: 'Triggered by GitHub webhook',
-      token: 'YOUR_SECRET_TOKEN',
       printContributedVariables: true,
       printPostContent: true
     )
