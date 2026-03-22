@@ -73,6 +73,10 @@ pipeline {
 
     stage('Debug Payload') {
       steps {
+        script {
+          echo "Trigger cause: ${currentBuild.getBuildCauses()}"
+        }
+
         echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
         echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
         echo "env.GITHUB_PR_BASE_REF: ${env.GITHUB_PR_BASE_REF}"
