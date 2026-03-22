@@ -46,13 +46,14 @@ pipeline {
       steps {
         script {
           telegram = load 'jenkins/shared/telegram.groovy'
-        }
-        deleteDir()
 
-        if (env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
-          git branch: "${BRANCH}", url: "${REPO_URL}"
-        } else {
-          git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
+          deleteDir()
+
+          if (env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
+            git branch: "${BRANCH}", url: "${REPO_URL}"
+          } else {
+            git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
+          }
         }
       }
     }
