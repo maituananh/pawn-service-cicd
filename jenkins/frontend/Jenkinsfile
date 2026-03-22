@@ -21,11 +21,12 @@ pipeline {
     githubPush()
     GenericTrigger(
       genericVariables: [
-        [key: 'GIT_BRANCH_REF', value: '$.ref'],
-        [key: 'PR_ACTION',      value: '$.action'],
-        [key: 'PR_MERGED',      value: '$.pull_request.merged'],
-        [key: 'REPO_NAME',      value: '$.repository.full_name'],
-        [key: 'COMMIT_SHA',     value: '$.after'],
+        [key: 'PR_ACTION',   value: '$.action'],
+        [key: 'PR_MERGED',   value: '$.pull_request.merged'],
+        [key: 'PR_BASE_REF', value: '$.pull_request.base.ref'],
+        [key: 'PR_HEAD_REF', value: '$.pull_request.head.ref'],
+        [key: 'REPO_NAME',   value: '$.repository.full_name'],
+        [key: 'COMMIT_SHA',  value: '$.pull_request.merge_commit_sha'],
       ],
       causeString: 'Triggered by GitHub webhook',
       token: 'YOUR_SECRET_TOKEN',
@@ -94,9 +95,12 @@ pipeline {
 
     stage('Debug Payload') {
       steps {
-        echo "Ref: ${env.GIT_BRANCH_REF}"
         echo "PR merged: ${env.PR_MERGED}"
         echo "Repo: ${env.REPO_NAME}"
+        echo "Action: ${env.PR_ACTION}"
+        echo "Base ref: ${env.PR_BASE_REF}"
+        echo "Head ref: ${env.PR_HEAD_REF}"
+        echo "Commit SHA: ${env.COMMIT_SHA}"
       }
     }
 
