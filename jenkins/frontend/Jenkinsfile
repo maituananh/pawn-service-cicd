@@ -21,7 +21,7 @@ pipeline {
     githubPush()
     GenericTrigger(
       genericVariables: [
-        [key: 'requestBody', value: '$', expressionType: 'JSONPath', regexpFilter: '', defaultValue: '']
+        [key: 'requestBody', value: '$', expressionType: 'JSONPath', regexpFilter: '', defaultValue: ''],
         [key: 'PR_ACTION',   value: '$.action'],
         [key: 'PR_MERGED',   value: '$.pull_request.merged'],
         [key: 'PR_BASE_REF', value: '$.pull_request.base.ref'],
