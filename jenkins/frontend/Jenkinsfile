@@ -21,6 +21,7 @@ pipeline {
     githubPush()
     GenericTrigger(
       genericVariables: [
+        [key: 'requestBody', value: '$', expressionType: 'JSONPath', regexpFilter: '', defaultValue: '']
         [key: 'PR_ACTION',   value: '$.action'],
         [key: 'PR_MERGED',   value: '$.pull_request.merged'],
         [key: 'PR_BASE_REF', value: '$.pull_request.base.ref'],
@@ -94,6 +95,18 @@ pipeline {
     }
 
     stage('Debug Payload') {
+      steps {
+        script {
+            def payload = readJSON text: requestBody
+            // Example: access a field
+            def action = payload.action
+            echo "Webhook action: ${action}"
+            // Use fields to control pipeline logic
+            if (action == 'deploy') {
+              echo "deploy"
+            }
+        }
+      }
       steps {
         echo "PR merged: ${env.PR_MERGED}"
         echo "Repo: ${env.REPO_NAME}"
