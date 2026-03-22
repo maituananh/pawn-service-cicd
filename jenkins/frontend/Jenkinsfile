@@ -18,7 +18,7 @@ pipeline {
   }
 
   triggers {
-    githubPush()
+    // githubPush()
     GenericTrigger(
       genericVariables: [
         [key: 'WEBHOOK_PAYLOAD', value: '$', defaultValue: '{}'],
