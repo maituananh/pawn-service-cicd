@@ -56,11 +56,22 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./alertmanager/config.yml:/etc/alertmanager/alertmanager.yml
     ports:
       - "9093:9093"
     container_name: alertmanager
     restart: always
+
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    ports:
+      - "9104:9104"
+    container_name: mysql-exporter
+    restart: always
+    command:
+      - "--config.my-cnf=/.my.cnf"
+    volumes:
+      - ./mysql-exporter/.my.cnf:/.my.cnf
 
 volumes:
   prometheus-data:

@@ -28,6 +28,11 @@ scrape_configs:
       - targets:
           - grafana:3000
 
+  - job_name: "mysqld"
+    static_configs:
+      - targets:
+          - "mysql-exporter:9104"
+
   - job_name: pawn_service_backend
     metrics_path: "/actuator/prometheus"
     static_configs:
