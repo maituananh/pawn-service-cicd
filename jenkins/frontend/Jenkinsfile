@@ -89,22 +89,13 @@ pipeline {
     }
 
     stage('Debug Payload') {
+      echo "env.GITHUB_PR_ACTION: ${env.GITHUB_PR_ACTION}"
+      echo "env.GITHUB_PR_MERGED: ${env.GITHUB_PR_MERGED}"
+      
       steps {
-        script {
-          def payload = readJSON text: env.WEBHOOK_PAYLOAD
-          echo "Action: ${payload.action}"
-          echo "Merged: ${payload.pull_request.merged}"
-          echo "Base:   ${payload.pull_request.base.ref}"
-        }
-
-        script {
-          def payload = readJSON text: requestBody
-          // Example: access a field
-          def action = payload.action
-          echo "Webhook action: ${action}"
-          // Use fields to control pipeline logic
-          if (action == 'deploy') {
-            echo "deploy"
+        when {
+          expression { 
+            return env.GITHUB_PR_ACTION == 'closed' && env.GITHUB_PR_MERGED == 'true' 
           }
         }
         
