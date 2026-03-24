@@ -33,8 +33,12 @@ scrape_configs:
       - targets:
           - "mysql-exporter:9104"
 
-  - job_name: pawn_service_backend
+  - job_name: backend
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets:
-          - "172.17.0.1:9999"
+      - targets: ['172.17.0.1:9999']
+        labels:
+          application: backend
+          DS_PROMETHEUS: "prometheus"
+          ds_prometheus: "prometheus"
+          instance: "172.17.0.1:9999"
