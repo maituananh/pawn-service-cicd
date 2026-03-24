@@ -153,7 +153,7 @@ pipeline {
           docker rm ${APP_NAME} || true
           docker run -d \\
             --name ${APP_NAME} \\
-            -p \${BE_PORT}:\${BE_PORT} \\
+            -p \${BE_PORT}:8080 \\
             -e SPRING_PROFILES_ACTIVE=prod \\
             -e DB_HOST=\${DB_HOST} \\
             -e AWS_S3_ENDPOINT=\${AWS_S3_ENDPOINT} \\
