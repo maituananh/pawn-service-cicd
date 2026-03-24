@@ -2,7 +2,6 @@ name: CI
 
 on:
   push:
-  pull_request:
 
 jobs:
   validate-frontend-Jenkinsfile:
@@ -11,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Validate Jenkinsfile
         run: |
-          curl -X POST \
+          curl --fail --show-error -X POST \
             https://jenkins.baotrang.io.vn/pipeline-model-converter/validate \
             -F "jenkinsfile=<jenkins/frontend/Jenkinsfile"
 
@@ -21,6 +20,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Validate Jenkinsfile
         run: |
-          curl -X POST \
+          curl --fail --show-error -X POST \
             https://jenkins.baotrang.io.vn/pipeline-model-converter/validate \
             -F "jenkinsfile=<jenkins/backend/Jenkinsfile"
