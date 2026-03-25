@@ -1,4 +1,5 @@
 def telegram
+def dockerCleanup
 
 pipeline {
   agent any
@@ -49,6 +50,7 @@ pipeline {
       steps {
         script {
           telegram = load 'jenkins/shared/telegram.groovy'
+          dockerCleanup = load 'jenkins/shared/dockerCleanup.groovy'
 
           deleteDir()
 
@@ -116,6 +118,20 @@ pipeline {
             docker images \${DOCKERHUB_REPO} --format "{{.Tag}}" | \\
             sort -r | tail -n +4 | xargs -r -I {} docker rmi \${DOCKERHUB_REPO}:{} || true
             """
+        }
+      }
+    }
+
+    stage('Clean Up Docker Hub Images') {
+      when {
+        expression {
+          return env.GITHUB_PR_MERGED == 'true'
+        }
+      }
+
+      steps {
+        script {
+          dockerCleanup("${env.DOCKERHUB_REPO}")
         }
       }
     }
