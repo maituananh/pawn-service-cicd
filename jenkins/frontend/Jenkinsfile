@@ -8,7 +8,6 @@ pipeline {
     BRANCH             = 'main'
     APP_NAME           = 'frontend-pawn-app'
     CICD_REPO_NAME     = 'maituananh/pawn-service-cicd'
-    REPO_URL_CICD      = 'https://github.com/maituananh/pawn-service-cicd'
 
     TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
     TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
@@ -50,7 +49,7 @@ pipeline {
 
           deleteDir()
 
-          if (env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
+          if (env.GITHUB_PR_MERGED == 'true' || env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
             git branch: "${BRANCH}", url: "${REPO_URL}"
           } else {
             git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
