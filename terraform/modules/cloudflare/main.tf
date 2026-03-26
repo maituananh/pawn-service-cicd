@@ -1,14 +1,10 @@
 terraform {
   required_providers {
     cloudflare = {
-      source = "cloudflare/cloudflare"
+      source  = "cloudflare/cloudflare"
       version = "~> 5.0"
     }
   }
-}
-
-provider "cloudflare" {
-  api_token = var.CLOUDFLARE_API_TOKEN
 }
 
 resource "random_password" "tunnel_secret" {
@@ -17,14 +13,14 @@ resource "random_password" "tunnel_secret" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "app" {
-  account_id = var.ACCOUNT_ID
-  name       = "pawn-service"
+  account_id    = var.ACCOUNT_ID
+  name          = "pawn-service"
   tunnel_secret = base64encode(random_password.tunnel_secret.result)
 }
 
 resource "cloudflare_dns_record" "root" {
   zone_id = var.ZONE_ID
-  name    = "${var.DOMAIN}"
+  name    = var.DOMAIN
   type    = "CNAME"
   proxied = true
   ttl     = 1
@@ -77,7 +73,7 @@ resource "cloudflare_dns_record" "jenkins" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "app" {
-  tunnel_id = cloudflare_zero_trust_tunnel_cloudflared.app.id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.app.id
   account_id = var.ACCOUNT_ID
 
   config = {
@@ -107,7 +103,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "app" {
         service  = "http://localhost:80"
       },
       {
-        service  = "http_status:404"
+        service = "http_status:404"
       }
     ]
   }
