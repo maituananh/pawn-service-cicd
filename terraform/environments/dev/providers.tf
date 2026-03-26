@@ -18,6 +18,10 @@ terraform {
       source  = "stripe/stripe"
       version = "~> 0.2.0"
     }
+    dockerhub = {
+      source  = "BarnabyShearer/dockerhub"
+      version = ">= 0.0.15"
+    }
   }
 }
 
@@ -31,4 +35,9 @@ provider "github" {
 
 provider "stripe" {
   api_key = var.STRIPE_SECRET_KEY
+}
+
+provider "dockerhub" {
+  username = var.DOCKER_USERNAME
+  password = var.DOCKER_PASSWORD
 }
