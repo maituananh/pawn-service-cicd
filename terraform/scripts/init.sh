@@ -4,9 +4,13 @@
 
 ENV=${1:-dev}
 cd "$(dirname "$0")/../environments/$ENV"
-terraform init
-terraform apply
+terraform init --target=module.stripe
+terraform apply --target=module.stripe
 
-terraform output tunnel_token
+# echo "Cloudflare Tunnel Token"
+# terraform output tunnel_token
+
+echo "Stripe Webhook Secret"
+terraform output stripe_webhook_secret
 
 # cloudflared tunnel run pawn-service

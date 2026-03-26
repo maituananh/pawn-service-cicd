@@ -14,6 +14,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.0"
     }
+    stripe = {
+      source  = "stripe/stripe"
+      version = "~> 0.2.0"
+    }
   }
 }
 
@@ -23,4 +27,8 @@ provider "cloudflare" {
 
 provider "github" {
   token = var.GITHUB_TOKEN
+}
+
+provider "stripe" {
+  api_key = var.STRIPE_SECRET_KEY
 }

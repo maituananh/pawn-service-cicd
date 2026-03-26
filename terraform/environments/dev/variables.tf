@@ -11,3 +11,7 @@ variable "FRONTEND_REPO_NAME" {}
 variable "BACKEND_REPO_NAME" {}
 variable "FRONTEND_WEBHOOK_PAYLOAD_URL" {}
 variable "BACKEND_WEBHOOK_PAYLOAD_URL" {}
+
+// Stripe
+variable "STRIPE_SECRET_KEY" {}
+variable "STRIPE_WEBHOOK_BACKEND_URL" {}
