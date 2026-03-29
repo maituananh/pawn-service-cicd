@@ -64,19 +64,19 @@ pipeline {
     stage('Build') {
       steps {
         sh 'chmod +x gradlew'
-        sh './gradlew clean build -x test'
+        sh './gradlew clean build -x test -Dspring.profiles.active=test'
       }
     }
 
     stage('Test') {
       steps {
-        sh './gradlew test'
+        sh './gradlew test -Dspring.profiles.active=test'
       }
     }
 
     stage('Package') {
       steps {
-        sh './gradlew bootJar'
+        sh './gradlew bootJar -Dspring.profiles.active=test'
       }
     }
 
