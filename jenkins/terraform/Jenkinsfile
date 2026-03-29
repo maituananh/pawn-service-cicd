@@ -50,7 +50,7 @@ pipeline {
     stage('Change Directory') {
       steps {
         sh 'ls -la'
-        sh 'cd environments/dev'
+        sh 'cd /environments/dev'
         sh 'ls -la'
       }
     }
