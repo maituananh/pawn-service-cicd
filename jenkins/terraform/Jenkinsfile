@@ -97,7 +97,11 @@ pipeline {
         stage('Terraform Plan') {
           steps {
             dir('environments/dev') {
-              withCredentials([file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE')]) {
+              withCredentials([
+                file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE'),
+                [ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds' ]
+                ]) {
+                sh 'unset AWS_PROFILE'
                 sh 'terraform plan -out=tfplan -var-file=$TFVARS_FILE'
               }
             }
