@@ -79,8 +79,9 @@ pipeline {
 
     stage('Terraform Deploy (Plan & Apply)') {
       when {
-        expression {
-          return env.GITHUB_PR_MERGED == 'true' || currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause) != null
+        anyOf {
+          expression { env.GITHUB_PR_MERGED == 'true' }
+          triggeredBy 'admin'
         }
       }
 
