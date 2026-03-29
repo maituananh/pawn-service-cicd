@@ -23,3 +23,13 @@ jobs:
           curl --fail --show-error -X POST \
             https://jenkins.baotrang.io.vn/pipeline-model-converter/validate \
             -F "jenkinsfile=<jenkins/backend/Jenkinsfile"
+
+  validate-terraform-Jenkinsfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Jenkinsfile
+        run: |
+          curl --fail --show-error -X POST \
+            https://jenkins.baotrang.io.vn/pipeline-model-converter/validate \
+            -F "jenkinsfile=<jenkins/terraform/Jenkinsfile"

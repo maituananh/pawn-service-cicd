@@ -71,7 +71,7 @@ pipeline {
       }
     }
 
-    stage('Terraform Deploy') {
+    stage('Terraform Deploy (Plan & Apply)') {
       when {
         expression {
           return env.GITHUB_PR_MERGED == 'true'
@@ -81,7 +81,9 @@ pipeline {
       stages {
         stage('Terraform Plan') {
           steps {
-            sh 'terraform plan -out=tfplan'
+            withCredentials([file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE')]) {
+              sh 'terraform -out=tfplan plan -var-file=$TFVARS_FILE'
+            }
           }
         }
 
