@@ -50,12 +50,15 @@ pipeline {
     stage('Change Directory') {
       steps {
         sh 'cd ./environments/dev'
+        sh 'ls -la'
       }
     }
 
     stage('Terraform Init') {
       steps {
-        sh 'terraform init -backend-config=./dev.hcl'
+        withCredentials([file(credentialsId: 'TF_BACKEND_DEV', variable: 'BACKEND_FILE')]) {
+          sh 'terraform init -backend-config=$BACKEND_FILE'
+        }
       }
     }
 
@@ -74,7 +77,7 @@ pipeline {
     stage('Terraform Deploy (Plan & Apply)') {
       when {
         expression {
-          return env.GITHUB_PR_MERGED == 'true'
+          return env.GITHUB_PR_MERGED == 'true' || currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause) != null
         }
       }
 
