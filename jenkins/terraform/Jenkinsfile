@@ -98,7 +98,7 @@ pipeline {
           steps {
             dir('environments/dev') {
               withCredentials([file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE')]) {
-                sh 'terraform -out=tfplan plan -var-file=$TFVARS_FILE'
+                sh 'terraform plan -out=tfplan -var-file=$TFVARS_FILE'
               }
             }
           }
