@@ -1,0 +1,104 @@
+def telegram
+
+pipeline {
+  agent any
+
+  environment {
+    REPO_URL           = 'https://github.com/maituananh/pawn-service-terraform'
+    BRANCH             = 'main'
+    APP_NAME           = 'pawn-service-terraform'
+
+    TELEGRAM_BOT_TOKEN = credentials('TELEGRAM_BOT_TOKEN')
+    TELEGRAM_CHAT_ID   = credentials('TELEGRAM_CHAT_ID')
+    SECRET_TOKEN_TERRAFORM    = credentials('SECRET_TOKEN_TERRAFORM')
+  }
+
+  triggers {
+    GenericTrigger(
+      genericVariables: [
+        [key: 'GITHUB_PR_ACTION',   value: '$.action',                defaultValue: ''],
+        [key: 'GITHUB_PR_MERGED',   value: '$.pull_request.merged',   defaultValue: 'false'],
+        [key: 'GITHUB_PR_BASE_REF', value: '$.pull_request.base.ref', defaultValue: ''],
+        [key: 'GITHUB_REPO_NAME',   value: '$.repository.full_name',  defaultValue: ''],
+        [key: 'GITHUB_PR_HEAD_REF', value: '$.pull_request.head.ref', defaultValue: ''],
+      ],
+      causeString: 'Triggered by GitHub webhook',
+      tokenCredentialId: 'SECRET_TOKEN_TERRAFORM',
+      token: 'SECRET_TOKEN_TERRAFORM',
+      printContributedVariables: true,
+      printPostContent: true
+    )
+  }
+
+  tools {
+    terraform 'terraform'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        script {
+          telegram = load 'jenkins/shared/telegram.groovy'
+
+          deleteDir()
+
+          git branch: "${BRANCH}", url: "${REPO_URL}"
+        }
+      }
+    }
+
+    stage('Change Directory') {
+      steps {
+        sh 'cd ./environments/dev'
+      }
+    }
+
+    stage('Terraform Init') {
+      steps {
+        sh 'terraform init -backend-config=./dev.hcl'
+      }
+    }
+
+    stage('Terraform Format') {
+      steps {
+        sh 'terraform fmt -check'
+      }
+    }
+
+    stage('Terraform Validate') {
+      steps {
+        sh 'terraform validate'
+      }
+    }
+
+    stage('Terraform Deploy') {
+      when {
+        expression {
+          return env.GITHUB_PR_MERGED == 'true'
+        }
+      }
+
+      stages {
+        stage('Terraform Plan') {
+          steps {
+            sh 'terraform plan -out=tfplan'
+          }
+        }
+
+        stage('Terraform Apply') {
+          steps {
+            sh 'terraform apply -auto-approve tfplan'
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        telegram.notifyResult("${env.GITHUB_PR_HEAD_REF}")
+      }
+    }
+  }
+}

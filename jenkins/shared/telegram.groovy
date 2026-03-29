@@ -33,4 +33,15 @@ def call(String status, String branchName) {
     '''
 }
 
+def notifyResult(String branchName) {
+    try {
+        def branch = branchName?.trim() ? branchName.trim() : 'main'
+        def status = currentBuild.currentResult ?: 'FAILURE'
+        call(status, branch)
+    } catch (Exception e) {
+        echo "Error: ${e}"
+        call('UNSTABLE', branchName)
+    }
+}
+
 return this

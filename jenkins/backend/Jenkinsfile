@@ -39,7 +39,7 @@ pipeline {
       ],
       causeString: 'Triggered by GitHub webhook',
       tokenCredentialId: 'SECRET_TOKEN_BE',
-      token: "SECRET_TOKEN_BE",
+      token: 'SECRET_TOKEN_BE',
       printContributedVariables: true,
       printPostContent: true
     )
@@ -54,11 +54,11 @@ pipeline {
 
           deleteDir()
 
-          if (env.GITHUB_PR_MERGED == 'true' || env.GITHUB_REPO_NAME == env.CICD_REPO_NAME) {
-            git branch: "${BRANCH}", url: "${REPO_URL}"
-          } else {
-            git branch: "${env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
-          }
+          def isMainBranch = env.GITHUB_PR_MERGED == 'true'
+                          || env.GITHUB_REPO_NAME == env.CICD_REPO_NAME
+                          || env.GITHUB_PR_HEAD_REF == null
+
+          git branch: "${isMainBranch ? BRANCH : env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
         }
       }
     }
@@ -186,18 +186,7 @@ pipeline {
   post {
     always {
       script {
-        if (currentBuild.currentResult == 'FAILURE') {
-          telegram('FAILURE', "${env.GITHUB_PR_HEAD_REF}")
-        }
-        else if (currentBuild.currentResult == 'SUCCESS') {
-          telegram('SUCCESS', "${env.GITHUB_PR_HEAD_REF}")
-        }
-        else if (currentBuild.currentResult == 'ABORTED') {
-          telegram('ABORTED', "${env.GITHUB_PR_HEAD_REF}")
-        }
-        else {
-          telegram('UNSTABLE', "${env.GITHUB_PR_HEAD_REF}")
-        }
+        telegram.notifyResult("${env.GITHUB_PR_HEAD_REF}")
       }
     }
   }
