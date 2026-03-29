@@ -81,7 +81,7 @@ pipeline {
       when {
         anyOf {
           expression { env.GITHUB_PR_MERGED == 'true' }
-          triggeredBy 'admin'
+          triggeredBy 'UserIdCause'
         }
       }
 
