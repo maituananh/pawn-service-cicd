@@ -78,7 +78,7 @@ pipeline {
     }
 
     stage('Debug Payload') {
-      stages {
+      steps {
         script {
           echo currentBuild.getBuildCauses().toString()
         }
