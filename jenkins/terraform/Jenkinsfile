@@ -78,8 +78,10 @@ pipeline {
     }
 
     stage('Terraform Deploy (Plan & Apply)') {
-      script {
-        echo currentBuild.getBuildCauses().toString()
+      stages {
+        script {
+          echo currentBuild.getBuildCauses().toString()
+        }
       }
 
       when {
