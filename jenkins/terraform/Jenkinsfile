@@ -77,13 +77,15 @@ pipeline {
       }
     }
 
-    stage('Terraform Deploy (Plan & Apply)') {
+    stage('Debug Payload') {
       stages {
         script {
           echo currentBuild.getBuildCauses().toString()
         }
       }
+    }
 
+    stage('Terraform Deploy (Plan & Apply)') {
       when {
         anyOf {
           expression { env.GITHUB_PR_MERGED == 'true' }
