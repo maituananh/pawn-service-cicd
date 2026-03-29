@@ -57,21 +57,27 @@ pipeline {
 
     stage('Terraform Init') {
       steps {
-        withCredentials([file(credentialsId: 'TF_BACKEND_DEV', variable: 'BACKEND_FILE')]) {
-          sh 'terraform init -backend-config=$BACKEND_FILE'
+        dir('environments/dev') {
+          withCredentials([file(credentialsId: 'TF_BACKEND_DEV', variable: 'BACKEND_FILE')]) {
+            sh 'terraform init -backend-config=$BACKEND_FILE'
+          }
         }
       }
     }
 
     stage('Terraform Format') {
       steps {
-        sh 'terraform fmt -check'
+        dir('environments/dev') {
+          sh 'terraform fmt -check'
+        }
       }
     }
 
     stage('Terraform Validate') {
       steps {
-        sh 'terraform validate'
+        dir('environments/dev') {
+          sh 'terraform validate'
+        }
       }
     }
 
@@ -85,15 +91,19 @@ pipeline {
       stages {
         stage('Terraform Plan') {
           steps {
-            withCredentials([file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE')]) {
-              sh 'terraform -out=tfplan plan -var-file=$TFVARS_FILE'
+            dir('environments/dev') {
+              withCredentials([file(credentialsId: 'DEV_TFVARS', variable: 'TFVARS_FILE')]) {
+                sh 'terraform -out=tfplan plan -var-file=$TFVARS_FILE'
+              }
             }
           }
         }
 
         stage('Terraform Apply') {
           steps {
-            sh 'terraform apply -auto-approve tfplan'
+            dir('environments/dev') {
+              sh 'terraform apply -auto-approve tfplan'
+            }
           }
         }
       }
