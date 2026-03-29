@@ -50,7 +50,10 @@ pipeline {
     stage('Terraform Init') {
       steps {
         dir('environments/dev') {
-          withCredentials([file(credentialsId: 'TF_BACKEND_DEV', variable: 'BACKEND_FILE')]) {
+          withCredentials([
+            file(credentialsId: 'TF_BACKEND_DEV', variable: 'BACKEND_FILE'),
+            [ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds' ]
+          ]) {
             sh 'unset AWS_PROFILE'
             sh 'terraform init -backend-config=$BACKEND_FILE'
           }
