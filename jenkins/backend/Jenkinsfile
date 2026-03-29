@@ -54,9 +54,7 @@ pipeline {
 
           deleteDir()
 
-          def isMainBranch = env.GITHUB_PR_MERGED == 'true'
-                          || env.GITHUB_REPO_NAME == env.CICD_REPO_NAME
-                          || env.GITHUB_PR_HEAD_REF == null
+          def isMainBranch = env.GITHUB_PR_MERGED == 'true' || env.GITHUB_REPO_NAME == env.CICD_REPO_NAME || env.GITHUB_PR_HEAD_REF == null
 
           git branch: "${isMainBranch ? BRANCH : env.GITHUB_PR_HEAD_REF}", url: "${REPO_URL}"
         }
