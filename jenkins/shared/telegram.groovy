@@ -35,7 +35,7 @@ def call(String status, String branchName) {
 
 def notifyResult(String branchName) {
     try {
-        def branch = branchName?.trim() ? branchName.trim() : 'main'
+        def branch = branchName?.trim()
         def status = currentBuild.currentResult ?: 'FAILURE'
         call(status, branch)
     } catch (Exception e) {
