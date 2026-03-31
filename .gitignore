@@ -25,3 +25,11 @@ terraform.rc
 
 # Logs
 *.log
+
+# Jenkins
+*.tar
+*.tar.gz
+*.zip
+
+# Bastion
+authorized_keys
