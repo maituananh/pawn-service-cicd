@@ -1,0 +1,17 @@
+version: "3.9"
+
+networks:
+  bastion-net:
+    driver: bridge
+
+services:
+  bastion:
+    build: .
+    container_name: bastion
+    ports:
+      - "2222:22"
+    volumes:
+      - ./authorized_keys:/home/bastion/.ssh/authorized_keys:ro
+    networks:
+      - bastion-net
+    restart: unless-stopped
