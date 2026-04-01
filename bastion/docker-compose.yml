@@ -2,16 +2,15 @@ version: "3.9"
 
 networks:
   bastion-net:
-    driver: bridge
+    name: backend_bastion-net
+    external: true
 
 services:
   bastion:
     build: .
-    container_name: bastion
+    container_name: bastion-ssh-1
     ports:
       - "2222:22"
-    volumes:
-      - ./authorized_keys:/home/bastion/.ssh/authorized_keys:ro
     networks:
       - bastion-net
     restart: unless-stopped
