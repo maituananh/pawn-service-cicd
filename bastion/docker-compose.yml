@@ -1,0 +1,16 @@
+version: "3.9"
+
+networks:
+  bastion-net:
+    name: backend_bastion-net
+    external: true
+
+services:
+  bastion:
+    build: .
+    container_name: bastion-ssh-1
+    ports:
+      - "2222:22"
+    networks:
+      - bastion-net
+    restart: unless-stopped
