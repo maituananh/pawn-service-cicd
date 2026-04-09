@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clusterip-app-deployment
+  namespace: dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: clusterIP-app
+  template:
+    metadata:
+      labels:
+        app: clusterIP-app
+    spec:
+      containers:
+        - name: app-container
+          image: vietaws/eks:v1
+          ports:
+            - containerPort: 8080
+          resources:
+            # Recommended
+            requests:
+              memory: "128Mi"
+              cpu: "256m"
+            limits:
+              memory: "128Mi"
+              # cpu: "512m"
