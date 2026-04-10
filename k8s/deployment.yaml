@@ -26,3 +26,10 @@ spec:
             limits:
               memory: "128Mi"
               # cpu: "512m"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pvc-data
