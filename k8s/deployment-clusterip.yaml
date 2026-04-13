@@ -18,6 +18,22 @@ spec:
           image: vietaws/eks:v1
           ports:
             - containerPort: 8080
+          env:
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: app-name
+            - name: SECRET_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: username
+            - name: SECRET_APP_NAME_STRING_DATA
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: app-name-string-data
           resources:
             # Recommended
             requests:
