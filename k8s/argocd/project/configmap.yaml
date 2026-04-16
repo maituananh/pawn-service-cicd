@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: dev
+data:
+  app-name: this-is-configmap
+  config.properties: |
+    app.name=ClusterIP App
+    app.version=1.0.0
+    app.description=This is a simple application that demonstrates the use of ConfigMap in Kubernetes.
+immutable: true
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: dev
+data:
+  username: YWRtaW5AZ21haWwuY29t
+  password: YWRtaW5AZ21haWwuY29t
+stringData:
+  app-name-string-data: this-is-secret-string-data
+immutable: true

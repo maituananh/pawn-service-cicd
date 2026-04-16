@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-app-ingress
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dev.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-svc
+                port:
+                  number: 80
+---
+# 3. Backend ClusterIP (Ingress route to here)
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-svc
+  namespace: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: dev-app
+  ports:
+    - port: 80
+      targetPort: 8080
