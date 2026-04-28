@@ -184,7 +184,7 @@ pipeline {
   post {
     always {
       script {
-        telegram.notifyResult("${env.GITHUB_PR_HEAD_REF ?: 'main'}")
+        telegram.notifyResult("${env.GITHUB_PR_HEAD_REF ?: BRANCH}")
       }
     }
   }
