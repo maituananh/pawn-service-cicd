@@ -1,0 +1,13 @@
+version: 3
+
+agent:
+  authtoken: 1cQUofxxxxxxxmNteE_xxxxxx
+
+tunnels:
+  mysql-blue:
+    proto: tcp
+    addr: 3306
+
+  mysql-green:
+    proto: tcp
+    addr: 3307
